@@ -1,0 +1,24 @@
+{
+  "name": "calProgettiAPI",
+  "version": "0.0.1",
+  "description": "a webapi rest for cal progetti",
+  "main": "server.js",
+  "homepage": "https://github.com/marcodemoja/calProgettiAPI",
+  "dependencies": {
+    "boom": "^2.6.0",
+    "joi": "^7.0.1",
+    "hapi": "^11.1.2",
+    "mongodb": "^2.0.52",
+    "mongoose": "^4.3.3"
+  },
+  "devDependencies": {
+    "lab": "^5.0.2",
+    "should": "^4.3.0"
+  },
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/marcodemoja/calProgettiAPI.git"
+  },
+  "author": "Marco De Mojà",
+  "license": "MIT"
+}
