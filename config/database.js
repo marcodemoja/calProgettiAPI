@@ -21,6 +21,9 @@ module.exports = function(){
             return this.cursor.model(modelName,schema);
     };
 
+    Database.prototype.createIndex = function(){
+
+    }
 
 
 

@@ -19,8 +19,7 @@ ProjectsController.prototype.index = function(request, reply) {
     if (limit == null) {
         limit = start + 9
     }
-    this.projectsModel.getProjects(start, limit).then(function(projects){
-        console.log(projects);
+    this.projectsModel.findAllWithStartLimit(start, limit).then(function(projects){
         reply(projects);
     });
 };
@@ -40,9 +39,11 @@ ProjectsController.prototype.show = function(request, reply) {
 ProjectsController.prototype.store = function(request, reply) {
     try {
         var value = request.payload.project;
+        var addQuery = this.projectsModel.add(value);
 
-        reply(this.projectsModel.addProject(value))
-            .created();
+        addQuery.then(function(){
+            reply().created();
+        });
     } catch (e) {
         reply(Boom.badRequest(e.message));
     }

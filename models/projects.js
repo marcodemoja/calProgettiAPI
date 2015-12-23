@@ -1,29 +1,30 @@
 'use strict';
 
-var crypto = require('crypto');
-
 function ProjectsModel(database) {
     this.db = database;
     this.model = this.db.setModel('projects',{
-        name: '',
+        name: {
+            type: String,
+            unique: true
+        }
     });
 
 };
 
-ProjectsModel.prototype.getAllProjects = function(callback) {
+ProjectsModel.prototype.findAll = function(args, callback) {
     var query;
 
     if( typeof callback == 'function')
-        query = this.model.find(callback).exec();
+        query = this.model.find(args, callback).exec();
     else
-       query = this.model.find().exec();
+       query = this.model.find(args).exec();
 
     return query;
 };
 
-ProjectsModel.prototype.findProjectsByProperty = function(prop, value) {
+ProjectsModel.prototype.findByProperty = function(prop, value) {
     var project, i, len;
-    var projects = this.getAllProjects();
+    var query = this.findAll({})
 
     for (i = 0, len = projects.length; i < len; i++) {
         project = projects[i];
@@ -35,16 +36,16 @@ ProjectsModel.prototype.findProjectsByProperty = function(prop, value) {
     return null;
 };
 
-ProjectsModel.prototype.getProjects = function(start, limit) {
-    var promise = this.getAllProjects(function(err, models){
+ProjectsModel.prototype.findAllWithStartLimit = function(start, limit) {
+    var promise = this.findAll({},function(err, models){
         return models.slice(start, limit + 1);
     });
 
     return promise;
 };
 
-ProjectsModel.prototype.getProject = function(id) {
-    var project = this.findProjectsByProperty('id', id);
+ProjectsModel.prototype.findOne = function(id) {
+    var project = this.findByProperty('id', id);
 
     if (!project) {
         throw new Error('Project doesn\'t exists.');
@@ -53,32 +54,20 @@ ProjectsModel.prototype.getProject = function(id) {
     return project;
 };
 
-ProjectsModel.prototype.addProject = function(newProject) {
-    var projects = this.getAllProjects();
+ProjectsModel.prototype.add = function(newProject) {
     newProject = newProject.trim();
-
-    // We don't want duplicates
-    if (this.findProjectByProperty('value', newProject)) {
-        throw new Error('Project already exists for id: ' + project.id);
-    }
-
     var project = {
-        // Collisions can happen but unlikely
-        // 1 byte to hex turns into two characters
-        id: crypto.randomBytes(8).toString('hex'),
-        value: newProject
+        name: newProject
     }
-    projects.push(project);
+    var model = new this.model(project);
 
-    //this.db.set('projects', projects);
-
-    return project;
+    return model.save();
 };
 
-ProjectsModel.prototype.updateProject = function(id, updatedProject) {
+ProjectsModel.prototype.update = function(id, updatedProject) {
     updatedProject = updatedProject.trim();
 
-    var project = this.findProjectByProperty('id', id);
+    var project = this.findByProperty('id', id);
 
     if (!project) {
         throw new Error('Project doesn\'t exists.');
@@ -89,13 +78,13 @@ ProjectsModel.prototype.updateProject = function(id, updatedProject) {
     return project;
 };
 
-ProjectsModel.prototype.deleteProject = function(id) {
-    if (!this.findProjectByProperty('id', id)) {
+ProjectsModel.prototype.delete = function(id) {
+    if (!this.findByProperty('id', id)) {
         throw new Error('Project doesn\'t exists.');
     }
 
     var project, i, len;
-    var projects = this.getAllProjects();
+    var projects = this.findAll();
 
     for (i = 0, len = projects.length; i < len; i++) {
         project = projects[i];

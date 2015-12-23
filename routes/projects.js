@@ -30,7 +30,7 @@ exports.register = function(server, option, next){
             config: {
                 handler: projectsController.store,
                 validate: {
-                    payload: Joi.object().length(1).keys({
+                    payload: Joi.object().length(1).keys( {
                         project: Joi.string().required().min(1).max(60)
                     })
                 }
