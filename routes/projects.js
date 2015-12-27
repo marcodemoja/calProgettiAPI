@@ -50,6 +50,18 @@ exports.register = function(server, option, next){
                     })
                 }
             }
+        },
+        {
+            method: 'DELETE',
+            path: '/projects/{id}',
+            config: {
+                handler: projectsController.destroy,
+                validate: {
+                    params: {
+                        id: Joi.string().regex(/[a-zA-Z0-9]{16}/)
+                    }
+                }
+            }
         }
     ]);
 

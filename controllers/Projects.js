@@ -19,7 +19,7 @@ ProjectsController.prototype.index = function(request, reply) {
     if (limit == null) {
         limit = start + 9
     }
-    this.projectsModel.findAllWithStartLimit(start, limit).then(function(projects){
+    this.projectsModel.findAll(start, limit).then(function(projects){
         reply(projects);
     });
 };
@@ -35,13 +35,14 @@ ProjectsController.prototype.show = function(request, reply) {
     }
 };
 
-// [POST] /tasks
+// [POST] /projects
 ProjectsController.prototype.store = function(request, reply) {
     try {
         var value = request.payload.project;
-        var addQuery = this.projectsModel.add(value);
 
-        addQuery.then(function(){
+        this.projectsModel.add(value)(function(err){
+            reply(Boom.badRequest(err.message));
+        }).then(function(){
             reply().created();
         });
     } catch (e) {
@@ -49,11 +50,11 @@ ProjectsController.prototype.store = function(request, reply) {
     }
 };
 
-// [PUT] /tasks/{id}
+// [PUT] /projects/{id}
 ProjectsController.prototype.update = function(request, reply) {
     try {
         var id = request.params.id;
-        var task = request.payload.project;
+        var project = request.payload.project;
 
         reply(this.projectsModel.updateProject(id, project));
     } catch (e) {
@@ -61,13 +62,14 @@ ProjectsController.prototype.update = function(request, reply) {
     }
 };
 
-// [DELETE] /tasks/{id}
+// [DELETE] /projects/{id}
 ProjectsController.prototype.destroy = function(request, reply) {
     try {
-        var id = request.params.id;
+        let id = request.params.id;
 
-        this.projectsModel.deleteProject(id);
-        reply().code(204);
+        this.projectsModel.destroy(id).then(function(result){
+            reply().code(204);
+        });
     } catch (e) {
         reply(Boom.notFound(e.message));
     }

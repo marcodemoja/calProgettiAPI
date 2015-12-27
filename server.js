@@ -25,7 +25,6 @@ Array.from(fsRoutes).forEach(function(file){
         }
     });
 });
-
 Server.register(routes, function (err) {
     if (err) { throw err; }
 

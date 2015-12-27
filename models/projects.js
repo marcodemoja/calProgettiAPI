@@ -2,56 +2,33 @@
 
 function ProjectsModel(database) {
     this.db = database;
-    this.model = this.db.setModel('projects',{
+    this.schema = new this.db.schema({
         name: {
             type: String,
             unique: true
         }
     });
 
-};
 
-ProjectsModel.prototype.findAll = function(args, callback) {
-    var query;
+    this.schema.pre('save',function(next){
+       var self = this;
 
-    if( typeof callback == 'function')
-        query = this.model.find(args, callback).exec();
-    else
-       query = this.model.find(args).exec();
+       database.cursor.model('projects').find({name: self.name},function(err, result){
 
-    return query;
-};
+           if(err) next(new Error(err));
+           else if(result){
+               self.invalidate("name" , "name must be unique");
+               next(new Error("name field must be unique"));
+           }else{
+               next();
+           }
+       });
 
-ProjectsModel.prototype.findByProperty = function(prop, value) {
-    var project, i, len;
-    var query = this.findAll({})
-
-    for (i = 0, len = projects.length; i < len; i++) {
-        project = projects[i];
-        if (project[prop] === value) {
-            return project;
-        }
-    }
-
-    return null;
-};
-
-ProjectsModel.prototype.findAllWithStartLimit = function(start, limit) {
-    var promise = this.findAll({},function(err, models){
-        return models.slice(start, limit + 1);
     });
 
-    return promise;
-};
 
-ProjectsModel.prototype.findOne = function(id) {
-    var project = this.findByProperty('id', id);
+    this.model = this.db.cursor.model('projects',this.schema);
 
-    if (!project) {
-        throw new Error('Project doesn\'t exists.');
-    }
-
-    return project;
 };
 
 ProjectsModel.prototype.add = function(newProject) {
@@ -61,40 +38,18 @@ ProjectsModel.prototype.add = function(newProject) {
     }
     var model = new this.model(project);
 
-    return model.save();
+    return model.save;
 };
 
-ProjectsModel.prototype.update = function(id, updatedProject) {
-    updatedProject = updatedProject.trim();
+ProjectsModel.prototype.findAll = function(start, limit){
 
-    var project = this.findByProperty('id', id);
+    if(!start) start = 0;
+    if(!limit) limit = 10;
 
-    if (!project) {
-        throw new Error('Project doesn\'t exists.');
-    }
+    let promise = this.model.find({}).skip(start).limit(limit).exec();
 
-    project.value = updatedProject;
-
-    return project;
+    return promise;
 };
 
-ProjectsModel.prototype.delete = function(id) {
-    if (!this.findByProperty('id', id)) {
-        throw new Error('Project doesn\'t exists.');
-    }
-
-    var project, i, len;
-    var projects = this.findAll();
-
-    for (i = 0, len = projects.length; i < len; i++) {
-        project = projects[i];
-        if (project.id === id) {
-            // Removes task
-            projects.splice(i, 1);
-            //this.db.set('projects', projects);
-            return;
-        }
-    }
-};
 
 module.exports = ProjectsModel;
