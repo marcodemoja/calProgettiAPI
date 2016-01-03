@@ -16,9 +16,10 @@ function ProjectsModel(database) {
        database.cursor.model('projects').find({name: self.name},function(err, result){
 
            if(err) next(new Error(err));
-           else if(result){
+           else if(result.length > 0){
+			console.log(result);
                self.invalidate("name" , "name must be unique");
-               next(new Error("name field must be unique"));
+               next(new Error("name must be unique"));
            }else{
                next();
            }

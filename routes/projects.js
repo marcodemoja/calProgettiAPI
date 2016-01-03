@@ -30,9 +30,15 @@ exports.register = function(server, option, next){
             config: {
                 handler: projectsController.store,
                 validate: {
-                    payload: Joi.object().length(1).keys( {
-                        project: Joi.string().required().min(1).max(60)
-                    })
+                    payload: Joi.object().length(1).keys({
+			                  data: {
+			                      type:"projects",
+			                      id:Joi.string(),
+			                      attributes:{
+			                          name:Joi.string().required().min(1).max(60)
+  			                    }
+			                  }
+			              })
                 }
             }
         },
@@ -46,7 +52,13 @@ exports.register = function(server, option, next){
                         id: Joi.string().regex(/[a-zA-Z0-9]{16}/)
                     },
                     payload: Joi.object().length(1).keys({
-                        project: Joi.string().required().min(1).max(60)
+                        data: {
+                          id: Joi.string(),
+                          type: "projects",
+                          attributes: {
+                              name: Joi.string().required().min(1).max(60)
+                          }
+                        }
                     })
                 }
             }

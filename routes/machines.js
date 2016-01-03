@@ -30,7 +30,10 @@ exports.register = function(server, options, next){
                 validate: {
                     payload: Joi.object().keys( {
                         data:{
-                         rif: Joi.string().required().min(1).max(12),
+                          type: "machines",
+                          id: Joi.string(),
+                          attributes: {
+                            rif: Joi.string().required().min(1).max(12),
                             sigla: Joi.string().required().min(1).max(12),
                             descrizione: Joi.string().required().min(1).max(100),
                             numero: Joi.number().required().min(1).max(12),
@@ -39,6 +42,8 @@ exports.register = function(server, options, next){
                             temperatura: Joi.number().required().min(1).max(12),
                             ph: Joi.string().required().min(1).max(12),
                             child:Joi.object()
+                          }
+
                         }})
                 }
             }
@@ -54,12 +59,16 @@ exports.register = function(server, options, next){
                     },
                     payload: Joi.object().length(1).keys({
                         data: {
+                          type: "machines",
+                          id: Joi.string(),
+                          attributes:{
                             descrizione: Joi.string().min(1).max(100),
                             numero: Joi.number().min(1).max(12),
                             servizio: Joi.string().min(1).max(12),
                             fluidoTrattato: Joi.string().min(1).max(12),
                             temperatura: Joi.number().min(1).max(12),
                             ph: Joi.string().min(1).max(12)
+                          }
                         }
                     })
                 }

@@ -20,7 +20,7 @@ ProjectsController.prototype.index = function(request, reply) {
         limit = start + 9
     }
     this.projectsModel.findAll(start, limit).then(function(projects){
-        reply(projects);
+        reply({data:projects});
     });
 };
 
@@ -38,10 +38,12 @@ ProjectsController.prototype.show = function(request, reply) {
 // [POST] /projects
 ProjectsController.prototype.store = function(request, reply) {
     try {
-        var value = request.payload.project;
+        var value = request.payload.data.attributes.name;
 
         this.projectsModel.add(value)(function(err){
-            reply(Boom.badRequest(err.message));
+	   if(err){
+            	reply(Boom.badRequest(err.message));
+	   }
         }).then(function(){
             reply().created();
         });
@@ -54,7 +56,7 @@ ProjectsController.prototype.store = function(request, reply) {
 ProjectsController.prototype.update = function(request, reply) {
     try {
         var id = request.params.id;
-        var project = request.payload.project;
+        var project = request.payload.data.attributes;
 
         reply(this.projectsModel.updateProject(id, project));
     } catch (e) {
